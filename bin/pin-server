@@ -1,0 +1,20 @@
+#!/usr/bin/env ruby
+require 'kajiki'
+require 'postmark-inbound'
+
+
+opts = Kajiki.preset_options(:server, {config: true})
+
+Kajiki.run(opts) do |cmd|
+  case cmd
+  when 'start'
+    PINS::Config.load_config(opts[:config]) if opts[:config]
+    require 'postmark-inbound/server'
+    PINS.logger.warn('Postmark Inbound Server starting...')
+    Rack::Server.start({
+      app: PINS::Server.new,
+      Host: opts[:address],
+      Port: opts[:port]
+    })
+  end
+end
