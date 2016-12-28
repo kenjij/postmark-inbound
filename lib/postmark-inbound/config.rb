@@ -20,7 +20,7 @@ module PINS
     end
 
     # Call this from your config file
-    def self.setup(&block)
+    def self.setup
       yield Config.shared
       PINS.logger.debug('Config.setup block executed.')
     end

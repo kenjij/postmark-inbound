@@ -6,9 +6,9 @@ A Ruby server for Postmark inbound webhook.
 
 ## Requirements
 
-- Ruby 2.1 <=
-- Kajiki 1.1 <=
-- Sinatra 1.4 <=
+- [Ruby](https://www.ruby-lang.org/) 2.1 <=
+- [Kajiki](https://kenjij.github.io/kajiki/) 1.1 <=
+- [Sinatra](http://www.sinatrarb.com) 1.4 <=
 
 ## Getting Started
 
@@ -30,10 +30,10 @@ PINS.logger.level = Logger::DEBUG
 PINS::Config.setup do |c|
   # User custom data
   c.user = {my_data1: 'Something', my_data2: 'Somethingelse'}
-  # If any number of strings are set, it will require a matching "?auth=" parameter in the incoming request
+  # Optional: if any number of strings are set, it will require a matching "?auth=" parameter in the incoming request
   c.auth_tokens = [
-    'adc9c81e23cd4ed785038028e69f7c54',
-    '4e1bca06d99f477f89c110e12e45f8f4'
+    'someSTRING1234',
+    'OTHERstring987'
   ]
   # HTTP server (Sinatra) settings
   c.dump_errors = true

@@ -40,7 +40,7 @@ module PINS
 
     # When adding a handler, call this to register a block
     def set_block(&block)
-      PINS.logger.debug("Registering block for handler: #{}")
+      PINS.logger.debug("Registering block for handler: #{myname}")
       @block = block
     end
 
