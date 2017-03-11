@@ -6,26 +6,15 @@ module PINS
   module Helper
 
     def parse_json(json)
-      obj = JSON.parse(json)
-      return parse_pm(keys_to_sym(obj)).merge!(catch_pm_headers(obj[:headers]))
+      obj = JSON.parse(downcase_keys(json), {symbolize_names: true})
+      return parse_pm(obj).merge!(catch_pm_headers(obj[:headers]))
     end
 
-    # Convert all Hash keys to lowercase symbols
-    # @param obj [Object] any Ruby object
-    def keys_to_sym(obj)
-      case obj
-      when Array
-        obj.each do |v|
-          keys_to_sym(v)
-        end
-      when Hash
-        obj.keys.each do |k|
-          if k.class == String
-            obj[k.downcase.to_sym] = keys_to_sym(obj.delete(k))
-          end
-        end
-      end
-      return obj
+    # Convert JSON keys to lowercase
+    # @param json [String]
+    # @return [String] converted JSON
+    def downcase_keys(json)
+      json.gsub(/"\w+":/) { |m| m.downcase }
     end
 
     # Additional parsing/conversions
@@ -94,6 +83,3 @@ module PINS
   end
 
 end
-
-
-[{'A' => 1, 'Base' => 'Text', 'He' => {'llo' => 2, 'NONE' => 0}, 'aRRAy' => [1,2,{a: 1, 'BB' => "two"}]}]
