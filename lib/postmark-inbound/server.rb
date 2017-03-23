@@ -6,8 +6,8 @@ module PINS
   # The Sinatra server
   class Server < Sinatra::Base
 
-    use Rack::Auth::Basic, "Restricted Area" do |username, password|
-      Config.shared.passwords.include?(password)
+    use Rack::Auth::Basic, "Restricted Area" do |_username, password|
+      PINS.config.passwords.include?(password)
     end
 
     helpers Helper
@@ -15,7 +15,7 @@ module PINS
     configure do
       set :environment, :production
       disable :static
-      c = Config.shared
+      c = PINS.config
       set :dump_errors, c.dump_errors
       set :logging, c.logging
       PINS.logger.info('Sinatra server configured.')
@@ -25,7 +25,7 @@ module PINS
       PINS.logger.info('Incoming request received.')
       PINS.logger.debug("Body size: #{request.content_length} bytes")
       request.body.rewind
-      Handler.run(parse_json(request.body.read))
+      Handler.run_handlers(parse_json(request.body.read))
       body ''
     end
 

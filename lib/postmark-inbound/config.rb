@@ -1,6 +1,8 @@
-require 'postmark-inbound/handler'
-
 module PINS
+
+  def self.config
+    Config.shared
+  end
 
   class Config
 
@@ -27,11 +29,13 @@ module PINS
 
     attr_accessor :user
     attr_accessor :passwords
+    attr_accessor :handler_paths
     attr_accessor :dump_errors
     attr_accessor :logging
 
     def initialize
       @passwords = []
+      @handler_paths = []
       @dump_errors = false
       @logging = false
     end

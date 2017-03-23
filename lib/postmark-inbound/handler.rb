@@ -1,52 +1,53 @@
 module PINS
 
+  def self.handlers
+    Handler.handlers
+  end
+
   class Handler
 
-    # Call as often as necessary to add handlers, usually from the config file; each call creates a PINS::Handler object
-    # @param name [Symbol] or a String
-    def self.add(name)
-      @catalog ||= {}
-      if @catalog[name]
-        PINS.logger.warn("Handler not added, duplicate name: #{name}")
-        return nil
-      end
-      handler = Handler.new(name)
-      yield handler if block_given?
-      @catalog[name] = handler
-      PINS.logger.info("Added handler: #{name}")
+    # Load handlers from directories designated in config
+    def self.autoload
+      PINS.config.handler_paths.each { |path|
+        load_from_path(path)
+      }
     end
 
-    # @return [Hash] containing all the handlers
-    def self.catalog
-      return @catalog
+    # Load handlers from a directory
+    # @param path [String] directory name
+    def self.load_from_path(path)
+      Dir.chdir(path) {
+        Dir.foreach('.') { |f| load f unless File.directory?(f) }
+      }
+    end
+
+    # Call as often as necessary to add handlers; each call creates a PINS::Handler object
+    def self.add(&block)
+      @handlers ||= []
+      @handlers << Handler.new(&block)
+      PINS.logger.debug("Added handler: #{@handlers.last}")
+    end
+
+    # @return [Array] containing all the handlers
+    def self.handlers
+      @handlers
     end
 
     # Run the handlers, typically called by the server
     # @param pin [Hash] from Postmark inbound webhook JSON
-    def self.run(pin, names = Handler.catalog.keys)
+    def self.run_handlers(pin)
       PINS.logger.info('Running handlers...')
-      names.each do |name|
-        (Handler.catalog)[name].run(pin)
-      end
+      @handlers.each { |h| h.run(pin) }
       PINS.logger.info('Done running handlers.')
     end
 
-    attr_reader :myname
-
-    def initialize(name)
-      PINS.logger.debug("Initializing handler: #{name}")
-      @myname = name
-    end
-
-    # When adding a handler, call this to register a block
-    def set_block(&block)
-      PINS.logger.debug("Registering block for handler: #{myname}")
+    def initialize(&block)
       @block = block
     end
 
     def run(obj)
-      PINS.logger.warn("No block to execute for handler: #{myname}") unless @block
-      PINS.logger.debug("Running handler: #{myname}")
+      PINS.logger.warn("No block to execute for handler: #{self}") unless @block
+      PINS.logger.debug("Running handler: #{self}")
       @block.call(obj)
     end
 
