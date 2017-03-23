@@ -6,6 +6,10 @@ module PINS
   # The Sinatra server
   class Server < Sinatra::Base
 
+    use Rack::Auth::Basic, "Restricted Area" do |username, password|
+      Config.shared.passwords.include?(password)
+    end
+
     helpers Helper
 
     configure do
@@ -15,11 +19,6 @@ module PINS
       set :dump_errors, c.dump_errors
       set :logging, c.logging
       PINS.logger.info('Sinatra server configured.')
-    end
-
-    before do
-      tokens = Config.shared.auth_tokens
-      halt 401 unless tokens.empty? || tokens.include?(params[:auth])
     end
 
     post '/' do
@@ -34,12 +33,6 @@ module PINS
       PINS.logger.info('Invalid request.')
       PINS.logger.debug("Request method and path: #{request.request_method} #{request.path}")
       json_with_object({message: 'Huh, nothing here.'})
-    end
-
-    error 401 do
-      PINS.logger.info(params[:auth] ? 'Invalid auth token provided.' : 'Missing auth token.')
-      PINS.logger.debug("Provided auth token: #{params[:auth]}") if params[:auth]
-      json_with_object({message: 'Oops, need a valid auth.'})
     end
 
     error do

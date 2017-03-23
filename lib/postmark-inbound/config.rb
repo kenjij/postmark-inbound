@@ -26,12 +26,12 @@ module PINS
     end
 
     attr_accessor :user
-    attr_accessor :auth_tokens
+    attr_accessor :passwords
     attr_accessor :dump_errors
     attr_accessor :logging
 
     def initialize
-      @auth_tokens = []
+      @passwords = []
       @dump_errors = false
       @logging = false
     end
