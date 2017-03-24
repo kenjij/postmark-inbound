@@ -9,6 +9,7 @@ Kajiki.run(opts) do |cmd|
   case cmd
   when 'start'
     PINS::Config.load_config(opts[:config]) if opts[:config]
+    PINS::Handler.autoload
     require 'postmark-inbound/server'
     PINS.logger.warn('Postmark Inbound Server starting...')
     Rack::Server.start({
