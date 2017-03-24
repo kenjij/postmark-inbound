@@ -27,7 +27,7 @@ module PINS
     # @param headers [Array]
     # @return [Hash]
     def catch_pm_headers(headers)
-      return nil unless Array === headers
+      return {} unless Array === headers
       caught = {}
       headers.each do |h|
         case h[:name]
